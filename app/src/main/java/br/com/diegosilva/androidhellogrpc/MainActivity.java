@@ -3,6 +3,7 @@ package br.com.diegosilva.androidhellogrpc;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 
 import com.annimon.stream.Optional;
 
+import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.examples.helloworld.GreeterGrpc;
@@ -42,6 +44,12 @@ public class MainActivity extends AppCompatActivity
                 ManagedChannel mChannel = ManagedChannelBuilder.forAddress("10.0.2.2", 50051)
                         .usePlaintext(true)
                         .build();
+
+//                mChannel.notifyWhenStateChanged(null, ()->{
+//                    ConnectivityState state = mChannel.getState(false);
+//                    Log.d(MainActivity.class.getName(), "Connection state: "+state);
+//                });
+
                 GreeterGrpc.GreeterBlockingStub stub = GreeterGrpc.newBlockingStub(mChannel);
                 HelloRequest message = HelloRequest.newBuilder().setName("Mensagem").build();
                 HelloReply reply = stub.sayHello(message);
@@ -49,7 +57,6 @@ public class MainActivity extends AppCompatActivity
             }).observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.newThread())
                     .subscribe(value -> {
-
                         Snackbar.make(view, "Ação Asincrona "+value.get().getMessage(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
 
